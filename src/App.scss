@@ -1,2 +1,55 @@
-.App {
+.header {
+  margin-bottom: 5rem;
+
+  .container {
+    background-color: #0667ae;
+    height: 85px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__main-title {
+    margin: 0;
+    color: #fff;
+    font-size: 3.5rem;
+    font-weight: 400;
+  }
+}
+
+.total {
+  margin-bottom: 5rem;
+
+  &__title {
+    font-size: 1.7rem;
+    color: rgb(71, 71, 71);
+    font-weight: normal;
+    text-align: center;
+  }
+
+  &__summary {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.list-countries {
+  &__title {
+    font-size: 1.7rem;
+    color: rgb(71, 71, 71);
+    font-weight: normal;
+    text-align: center;
+  }
+
+  &__bookmarked-title {
+    font-size: 15px;
+    font-weight: 400;
+    margin: 0 0 0.7rem 0;
+  }
+
+  &__bookmarked-list {
+    display: flex;
+    margin-bottom: 3rem;
+  }
 }

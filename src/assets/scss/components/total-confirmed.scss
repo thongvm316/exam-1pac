@@ -1,0 +1,23 @@
+.total__detail {
+  border: 1px solid rgb(231, 230, 230);
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 10px;
+
+  flex-basis: 30%;
+  max-width: 30%;
+  padding: 2rem;
+  text-align: center;
+
+  h4 {
+    font-size: 15px;
+    margin: 0 0 0.7rem 0;
+    font-weight: 400;
+  }
+
+  p {
+    font-size: 40px;
+    color: #0070ba;
+    font-weight: bold;
+    margin: 0;
+  }
+}
