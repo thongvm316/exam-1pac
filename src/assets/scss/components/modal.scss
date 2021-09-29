@@ -1,0 +1,103 @@
+.modal {
+  width: 100vw;
+  height: 100vh;
+  background-color: #00000087;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+
+  &__container {
+    width: 800px;
+    min-height: 500px;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+  }
+
+  &__title {
+    display: inline-block;
+    text-align: center;
+  }
+
+  &__closeButton {
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      background-color: transparent;
+      border: none;
+      font-size: 25px;
+      cursor: pointer;
+    }
+  }
+
+  &__body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  &__country-information {
+    display: flex;
+    justify-content: center;
+
+    div:first-child {
+      flex-basis: 40%;
+      max-width: 40%;
+    }
+
+    div:last-child {
+      flex-basis: 25%;
+      max-width: 25%;
+    }
+  }
+
+  &__country-image {
+    margin-right: 1.5rem;
+
+    img {
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__country-detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    p {
+      margin: 0;
+      font-weight: 400;
+      text-align: center;
+
+      span {
+        font-weight: 300;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    button {
+      width: 150px;
+      height: 45px;
+      margin: 10px;
+      border: none;
+      background-color: #0667ae;
+      color: white;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,3 +1,18 @@
+@import './assets/scss/responsive';
+
+@mixin line {
+  &::after {
+    position: absolute;
+    content: '';
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background-color: #0667ae;
+  }
+}
+
 .header {
   margin-bottom: 5rem;
 
@@ -26,11 +41,23 @@
     color: rgb(71, 71, 71);
     font-weight: normal;
     text-align: center;
+    text-transform: uppercase;
+
+    position: relative;
+    @include line;
   }
 
   &__summary {
     display: flex;
     justify-content: space-between;
+    position: relative;
+  }
+
+  &__spinner {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -40,16 +67,102 @@
     color: rgb(71, 71, 71);
     font-weight: normal;
     text-align: center;
+    text-transform: uppercase;
+
+    position: relative;
+    @include line;
   }
 
   &__bookmarked-title {
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 400;
     margin: 0 0 0.7rem 0;
   }
 
   &__bookmarked-list {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 3rem;
+  }
+
+  &__table {
+    position: relative;
+  }
+
+  &__spinner {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive */
+.header {
+  @include screen('sm') {
+    &__main-title {
+      font-size: 2.5rem;
+    }
+  }
+
+  @include screen('xs') {
+    &__main-title {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.total {
+  @include screen('sm') {
+    &__detail {
+      padding: 1rem;
+
+      p {
+        font-size: 24px;
+      }
+    }
+  }
+
+  @include screen('xs') {
+    &__title {
+      font-size: 1.5rem;
+    }
+
+    &__detail {
+      flex-basis: 100%;
+      max-width: 100%;
+      margin-bottom: 1rem;
+      padding: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      p {
+        font-size: 24px;
+      }
+    }
+
+    &__summary {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.list-countries {
+  @include screen('xs') {
+    &__title {
+      font-size: 1.5rem;
+    }
+  }
+
+  @include breakpoint-down('md') {
+    &__table {
+      overflow-x: scroll;
+      table {
+        min-width: 700px;
+      }
+    }
   }
 }

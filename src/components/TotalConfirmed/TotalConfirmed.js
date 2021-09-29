@@ -5,7 +5,7 @@ import '../../assets/scss/components/total-confirmed.scss'
 const TotalConfirmed = (props) => {
   const { title, confirmed, className } = props
 
-  function formatNumber(num) {
+  const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   }
 
