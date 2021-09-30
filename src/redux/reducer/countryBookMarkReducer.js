@@ -1,9 +1,7 @@
 import * as actionTypes from '../action/types'
 
 const initialState = {
-  loading: true,
   countryBookMark: [],
-  error: null,
 }
 
 export default function (state = initialState, action) {
@@ -12,8 +10,14 @@ export default function (state = initialState, action) {
     case actionTypes.ADD_COUNTRY:
       return {
         ...state,
-        loading: false,
         countryBookMark: [...state.countryBookMark, payload],
+      }
+    case actionTypes.REMOVE_COUNTRY:
+      return {
+        ...state,
+        countryBookMark: state.countryBookMark.filter(
+          (item) => item.id !== payload,
+        ),
       }
     default:
       return state

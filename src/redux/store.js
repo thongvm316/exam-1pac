@@ -1,11 +1,6 @@
-import { createStore, applyMiddleware } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
-import thunk from 'redux-thunk'
+import { createStore } from 'redux'
 import countryBookMarkReducer from './reducer/countryBookMarkReducer'
 
-const store = createStore(
-  countryBookMarkReducer,
-  composeWithDevTools(applyMiddleware(thunk)),
-)
+const store = createStore(countryBookMarkReducer)
 
 export default store

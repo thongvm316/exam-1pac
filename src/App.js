@@ -5,50 +5,64 @@ import Container from './components/Container/Container'
 import TotalConfirmed from './components/TotalConfirmed/TotalConfirmed'
 import BookMarked from './components/BookMarked/BookMarked'
 import Table from './components/Table/Table'
-import Modal from './components/Modal/Modal'
 import Spinner from './components/Spinner/Spinner'
+import Alert from './components/Alert/Alert'
+import Modal from './components/Modal/Modal'
+
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  addCountryBookMarkAction,
+  removeCountryBookMarkAction,
+} from './redux/action/countryBookMarkAction'
 
 import './App.scss'
 
 const App = () => {
-  const [data, setData] = React.useState({})
-  const [mostAffectCountries, setMostAffectCountries] = React.useState([])
+  const dispatch = useDispatch()
+  const { countryBookMark } = useSelector((state) => state)
+
   const [modalOpen, setModalOpen] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
+  const [alertOpen, setAlertOpen] = React.useState(false)
+  const [countryCode, setCountryCode] = React.useState('')
+  const [loading, setLoading] = React.useState(true)
+  const [select, setSelect] = React.useState('mostAffectCountries')
+  const [data, setData] = React.useState({
+    globalSituation: null,
+    mostAffectCountries: [],
+    highestDeaths: [],
+    leastNumberOfRecovered: [],
+  })
+  const { globalSituation } = data
 
-  const { Global } = data
-
-  const findIndicesOfMax = (inp, count) => {
-    let outp = []
-    for (let i = 0; i < inp.length; i++) {
-      outp.push(i)
-      if (outp.length > count) {
-        outp.sort(function (a, b) {
-          return inp[b] - inp[a]
-        })
-        outp.pop()
-      }
-    }
-    return outp
-  }
-
-  const getMostAffectCountries = (data) => {
-    const getTotalConfirmedCases = data.map((item, i) => item.TotalConfirmed)
-    const indices = findIndicesOfMax(getTotalConfirmedCases, 15)
-    const countries = []
-    for (let i = 0; i < indices.length; i++) {
-      countries.push(data[indices[i]])
+  const filterDataByRules = (db, property, key) => {
+    let filterData
+    if (key === 'leastNumberOfRecovered') {
+      filterData = db.sort((a, b) => a[property] - b[property]).slice(0, 15)
+    } else {
+      filterData = db.sort((a, b) => b[property] - a[property]).slice(0, 15)
     }
 
-    return countries
+    setData((prev) => ({ ...prev, [key]: filterData }))
   }
 
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const { data } = await axios.get('https://api.covid19api.com/summary')
-        setData(data)
-        setMostAffectCountries(getMostAffectCountries(data?.Countries))
+        const { data: summary } = await axios.get(
+          'https://api.covid19api.com/summary',
+        )
+        setData({ ...data, globalSituation: summary.Global })
+        filterDataByRules(
+          summary.Countries,
+          'TotalConfirmed',
+          'mostAffectCountries',
+        )
+        filterDataByRules(summary.Countries, 'TotalDeaths', 'highestDeaths')
+        filterDataByRules(
+          summary.Countries,
+          'TotalRecovered',
+          'leastNumberOfRecovered',
+        )
         setLoading(false)
       } catch (error) {
         setLoading(false)
@@ -61,7 +75,10 @@ const App = () => {
 
   return (
     <div className='home'>
-      {modalOpen && <Modal setOpenModal={setModalOpen} />}
+      {modalOpen && (
+        <Modal countryCode={countryCode} setOpenModal={setModalOpen} />
+      )}
+      {alertOpen && <Alert setAlertOpen={setAlertOpen} />}
 
       <header className='header'>
         <Container>
@@ -78,20 +95,23 @@ const App = () => {
               <Spinner className='total__spinner' />
             ) : (
               <>
-                {' '}
                 <TotalConfirmed
                   title='Confirmed Cases'
-                  confirmed={Global ? Global.TotalConfirmed : 0}
+                  confirmed={
+                    globalSituation ? globalSituation?.TotalConfirmed : 0
+                  }
                   className='total__detail'
                 />
                 <TotalConfirmed
                   title='Confirmed Deaths'
-                  confirmed={Global ? Global.TotalDeaths : 0}
+                  confirmed={globalSituation ? globalSituation?.TotalDeaths : 0}
                   className='total__detail'
                 />
                 <TotalConfirmed
                   title='Total Recovered'
-                  confirmed={Global ? Global.TotalRecovered : 0}
+                  confirmed={
+                    globalSituation ? globalSituation?.TotalRecovered : 0
+                  }
                   className='total__detail'
                 />
               </>
@@ -105,14 +125,10 @@ const App = () => {
           <h2 className='list-countries__title'>Most-affected countries</h2>
 
           <div className='list-countries__bookmarked'>
-            <h4 className='list-countries__bookmarked-title'>
-              Bookmark Country
-            </h4>
             <div className='list-countries__bookmarked-list'>
-              <BookMarked country='Korean' />
-              <BookMarked country='VietNam' />
-              <BookMarked country='Japan' />
-              <BookMarked country='HongKong' />
+              {countryBookMark.map((item, i) => (
+                <BookMarked key={i} country={item.country} />
+              ))}
             </div>
           </div>
 
@@ -121,8 +137,17 @@ const App = () => {
               <Spinner className='list-countries__spinner' />
             ) : (
               <>
-                {/* <Table rows={Countries ? Countries : []} /> */}
-                <Table rows={mostAffectCountries} />
+                <Table
+                  rows={data[select]}
+                  setSelect={setSelect}
+                  select={select}
+                  dispatch={dispatch}
+                  addCountryBookMarkAction={addCountryBookMarkAction}
+                  removeCountryBookMarkAction={removeCountryBookMarkAction}
+                  setAlertOpen={setAlertOpen}
+                  setModalOpen={setModalOpen}
+                  setCountryCode={setCountryCode}
+                />
               </>
             )}
 

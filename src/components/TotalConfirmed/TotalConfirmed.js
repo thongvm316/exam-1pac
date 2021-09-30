@@ -12,7 +12,7 @@ const TotalConfirmed = (props) => {
   return (
     <div className={className}>
       <h4>{title}</h4>
-      <p>{formatNumber(confirmed)}</p>
+      <p>{formatNumber(confirmed ? confirmed : 0)}</p>
     </div>
   )
 }
