@@ -12,6 +12,7 @@ const Row = ({
   dispatch,
   setModalOpen,
   setCountryCode,
+  setCountryName,
 }) => {
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -33,6 +34,7 @@ const Row = ({
   const handleClick = (e) => {
     setModalOpen(true)
     setCountryCode(row.CountryCode)
+    setCountryName(row.Slug)
   }
 
   return (
@@ -87,6 +89,7 @@ const Table = ({
   setAlertOpen,
   setModalOpen,
   setCountryCode,
+  setCountryName,
 }) => {
   return (
     <>
@@ -118,6 +121,7 @@ const Table = ({
                 dispatch={dispatch}
                 setModalOpen={setModalOpen}
                 setCountryCode={setCountryCode}
+                setCountryName={setCountryName}
               />
             )
           })}

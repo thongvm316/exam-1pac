@@ -1,80 +1,155 @@
 import React from 'react'
+import axios from 'axios'
+import moment from 'moment'
+import queryString from 'query-string'
+
 import Spinner from '../Spinner/Spinner'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import axios from 'axios'
+import * as hcnd from 'highcharts/modules/no-data-to-display'
 
 import '../../assets/scss/components/modal.scss'
 
-const Modal = ({ setOpenModal, countryCode }) => {
-  const [data, setData] = React.useState(null)
-  const [loading, setLoading] = React.useState(false)
+const fakeData = {
+  name: 'Germany',
+  topLevelDomain: ['.de'],
+  alpha2Code: 'DE',
+  alpha3Code: 'DEU',
+  callingCodes: ['49'],
+  capital: 'Berlin',
+  altSpellings: [
+    'DE',
+    'Federal Republic of Germany',
+    'Bundesrepublik Deutschland',
+  ],
+  region: 'Europe',
+  flag: 'https://flagcdn.com/w320/de.jpg',
+}
 
-  const options = {
-    chart: {
-      type: 'line',
-    },
-    title: {
-      text: 'Statistics',
-    },
-    subtitle: {
-      text: '',
-    },
-    xAxis: {
-      categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ],
-    },
-    yAxis: {
+hcnd(Highcharts)
+
+const Modal = ({ setOpenModal, countryCode, countryName }) => {
+  const [data, setData] = React.useState(fakeData)
+  const [dataDetailCountry, setDataDetailCountry] = React.useState([])
+  const [selectYear, setSelectYear] = React.useState('2021')
+  const [loading, setLoading] = React.useState(true)
+  const [loadingChart, setLoadingChart] = React.useState(false)
+
+  const handleChangeSelect = (e) => {
+    setSelectYear(e.target.value)
+    setLoadingChart(true)
+  }
+
+  const options = React.useMemo(
+    () => ({
+      chart: {
+        type: 'column',
+      },
       title: {
-        text: false,
+        text: '',
       },
-    },
-    plotOptions: {
-      line: {
-        dataLabels: {
-          enabled: false,
+      subtitle: {
+        text: '',
+      },
+      xAxis: {
+        categories: [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ],
+        crosshair: true,
+      },
+      tooltip: {
+        shared: true,
+      },
+      yAxis: {
+        title: {
+          text: false,
         },
-        enableMouseTracking: true,
-        marker: {
-          enabled: true,
+      },
+      plotOptions: {
+        line: {
+          dataLabels: {
+            enabled: false,
+          },
+          enableMouseTracking: true,
+          marker: {
+            enabled: true,
+          },
         },
       },
-    },
-    xAxis: {
-      crosshair: true,
-    },
-    series: [
-      {
-        name: 'Tokyo',
-        data: [
-          7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6,
-        ],
+      series: [
+        {
+          name: 'Confirmed',
+          data: dataDetailCountry.map((item) => item.Confirmed),
+          color: '#FEB13B',
+        },
+        {
+          name: 'Deaths',
+          data: dataDetailCountry.map((item) => item.Deaths),
+          color: '#e74c3c',
+        },
+        {
+          name: 'Recovered',
+          data: dataDetailCountry.map((item) => item.Recovered),
+          color: '#27ae60',
+        },
+      ],
+      lang: {
+        noData: 'Can not get data because this API is broken',
       },
-      {
-        name: 'London',
-        data: [
-          3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,
-        ],
+      noData: {
+        style: {
+          fontWeight: 'bold',
+          fontSize: '15px',
+          color: '#303030',
+        },
       },
-      {
-        name: 'Korean',
-        data: [
-          3.9, 2.2, 7.7, 8.5, 15.9, 15.2, 17.0, 21.6, 14.2, 26.3, 6.6, 32.8,
-        ],
-      },
-    ],
+    }),
+    [dataDetailCountry],
+  )
+
+  console.log(options)
+
+  const formatConditionDate = (year, index) => {
+    const format = `${year}-${index < 10 ? `0${index}` : index}`
+    const endOfMonth = moment(format).endOf('month').format('DD')
+    return `${format}-${endOfMonth}`
+  } // eg: 2021-02-28
+
+  const filterLastElOfEachMonth = (db) => {
+    let arr = []
+
+    const lastElOfData = db[db.length - 1]
+    const currentMonth = parseInt(moment(lastElOfData['Date']).format('MM'))
+
+    for (let index = 1; index <= currentMonth; index++) {
+      const lastElOfEachMonth = db.find((item) => {
+        const dateOfItem = moment(item['Date']).format('YYYY-MM-DD')
+        const endOfDateInMonth = formatConditionDate(selectYear, index)
+
+        if (index !== currentMonth) {
+          return dateOfItem === endOfDateInMonth
+        } else {
+          return (
+            dateOfItem === moment(lastElOfData['Date']).format('YYYY-MM-DD')
+          )
+        }
+      })
+
+      arr.push(lastElOfEachMonth)
+    }
+
+    return arr
   }
 
   React.useEffect(() => {
@@ -87,15 +162,48 @@ const Modal = ({ setOpenModal, countryCode }) => {
           'flag'
         ] = `https://flagcdn.com/w320/${countryCode.toLowerCase()}.jpg`
         setData(data)
-        setLoading(false)
       } catch (error) {
         setLoading(false)
         console.log(error.response)
       }
     }
 
-    // getData() // ! change loading
-  }, [])
+    const getDetailCountrySituation = async () => {
+      try {
+        const currentYear = moment().format('YYYY')
+
+        const startOfYearSelected = moment(selectYear)
+          .startOf('year')
+          .format('YYYY-MM-DD')
+        const endOfYearSelected = moment(selectYear)
+          .endOf('year')
+          .format('YYYY-MM-DD')
+
+        const currentDate = moment().format('YYYY-MM-DD')
+
+        const params = {
+          from: startOfYearSelected,
+          to: selectYear === currentYear ? currentDate : endOfYearSelected,
+        }
+
+        const url = `https://api.covid19api.com/country/${countryName}?${queryString.stringify(
+          params,
+        )}`
+
+        const { data } = await axios.get(url)
+        setDataDetailCountry(filterLastElOfEachMonth(data))
+        setLoading(false)
+        setLoadingChart(false)
+      } catch (error) {
+        setLoading(false)
+        setLoadingChart(false)
+        console.log(error)
+      }
+    }
+
+    // getData()
+    getDetailCountrySituation()
+  }, [selectYear])
 
   return (
     <div className='modal'>
@@ -137,9 +245,30 @@ const Modal = ({ setOpenModal, countryCode }) => {
                 </div>
               </div>
 
-              <div className='modal__graph'>
-                <HighchartsReact highcharts={Highcharts} options={options} />
-              </div>
+              {loadingChart ? (
+                <Spinner className='modal__spinner-chart' />
+              ) : (
+                <>
+                  {' '}
+                  <div className='modal__graph'>
+                    <div className='modal__graph-title'>
+                      <h4>Statistics</h4>
+                      <select
+                        className='modal__graph-dropdown'
+                        value={selectYear}
+                        onChange={handleChangeSelect}
+                      >
+                        <option value='2020'>2020</option>
+                        <option value='2021'>2021</option>
+                      </select>
+                    </div>
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={options}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className='modal__footer'>

@@ -24,6 +24,7 @@ const App = () => {
   const [modalOpen, setModalOpen] = React.useState(false)
   const [alertOpen, setAlertOpen] = React.useState(false)
   const [countryCode, setCountryCode] = React.useState('')
+  const [countryName, setCountryName] = React.useState('')
   const [loading, setLoading] = React.useState(true)
   const [select, setSelect] = React.useState('mostAffectCountries')
   const [data, setData] = React.useState({
@@ -76,7 +77,11 @@ const App = () => {
   return (
     <div className='home'>
       {modalOpen && (
-        <Modal countryCode={countryCode} setOpenModal={setModalOpen} />
+        <Modal
+          countryCode={countryCode}
+          countryName={countryName}
+          setOpenModal={setModalOpen}
+        />
       )}
       {alertOpen && <Alert setAlertOpen={setAlertOpen} />}
 
@@ -147,6 +152,7 @@ const App = () => {
                   setAlertOpen={setAlertOpen}
                   setModalOpen={setModalOpen}
                   setCountryCode={setCountryCode}
+                  setCountryName={setCountryName}
                 />
               </>
             )}
