@@ -91,6 +91,8 @@ const Table = ({
   setCountryCode,
   setCountryName,
 }) => {
+  console.log(rows)
+
   return (
     <>
       <table>

@@ -4,7 +4,7 @@ const initialState = {
   countryBookMark: [],
 }
 
-export default function (state = initialState, action) {
+const countryBookMarkReducer = (state = initialState, action) => {
   const { type, payload } = action
   switch (type) {
     case actionTypes.ADD_COUNTRY:
@@ -23,3 +23,5 @@ export default function (state = initialState, action) {
       return state
   }
 }
+
+export default countryBookMarkReducer

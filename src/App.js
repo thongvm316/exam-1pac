@@ -156,15 +156,6 @@ const App = () => {
                 />
               </>
             )}
-
-            {/* <button
-              className='openModalBtn'
-              onClick={() => {
-                setModalOpen(true)
-              }}
-            >
-              Open
-            </button> */}
           </div>
         </Container>
       </div>

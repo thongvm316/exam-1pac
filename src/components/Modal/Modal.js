@@ -10,27 +10,12 @@ import * as hcnd from 'highcharts/modules/no-data-to-display'
 
 import '../../assets/scss/components/modal.scss'
 
-const fakeData = {
-  name: 'Germany',
-  topLevelDomain: ['.de'],
-  alpha2Code: 'DE',
-  alpha3Code: 'DEU',
-  callingCodes: ['49'],
-  capital: 'Berlin',
-  altSpellings: [
-    'DE',
-    'Federal Republic of Germany',
-    'Bundesrepublik Deutschland',
-  ],
-  region: 'Europe',
-  flag: 'https://flagcdn.com/w320/de.jpg',
-}
-
 hcnd(Highcharts)
 
 const Modal = ({ setOpenModal, countryCode, countryName }) => {
-  const [data, setData] = React.useState(fakeData)
+  const [data, setData] = React.useState(null)
   const [dataDetailCountry, setDataDetailCountry] = React.useState([])
+  const [dataOfUS, setDataOfUS] = React.useState(null)
   const [selectYear, setSelectYear] = React.useState('2021')
   const [loading, setLoading] = React.useState(true)
   const [loadingChart, setLoadingChart] = React.useState(false)
@@ -105,7 +90,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
         },
       ],
       lang: {
-        noData: 'Can not get data because this API is broken',
+        noData: 'Can not get data of this country.',
       },
       noData: {
         style: {
@@ -118,7 +103,57 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
     [dataDetailCountry],
   )
 
-  console.log(options)
+  const optionsPieChart = React.useMemo(
+    () => ({
+      chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie',
+      },
+      title: {
+        text: '',
+      },
+
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            format: '<b>{point.name}</b>: {point.y}',
+          },
+          showInLegend: true,
+        },
+      },
+      series: [
+        {
+          name: 'Brands',
+          colorByPoint: true,
+          data: [
+            {
+              name: 'Confirmed',
+              y: dataOfUS?.Confirmed,
+              sliced: true,
+              selected: true,
+              color: '#FEB13B',
+            },
+            {
+              name: 'Deaths',
+              y: dataOfUS?.Deaths,
+              color: '#e74c3c',
+            },
+            {
+              name: 'Recovered',
+              y: dataOfUS?.Recovered,
+              color: '#27ae60',
+            },
+          ],
+        },
+      ],
+    }),
+    [dataOfUS],
+  )
 
   const formatConditionDate = (year, index) => {
     const format = `${year}-${index < 10 ? `0${index}` : index}`
@@ -138,10 +173,11 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
         const endOfDateInMonth = formatConditionDate(selectYear, index)
 
         if (index !== currentMonth) {
-          return dateOfItem === endOfDateInMonth
+          return dateOfItem === endOfDateInMonth && item.Province === '' // * use in case that country has data of each Province
         } else {
           return (
-            dateOfItem === moment(lastElOfData['Date']).format('YYYY-MM-DD')
+            dateOfItem === moment(lastElOfData['Date']).format('YYYY-MM-DD') &&
+            item.Province === '' // * use in case that country has data of each Province
           )
         }
       })
@@ -155,7 +191,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=92835e4eeb6ba3f732cae29dabda6fed`
+        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=464a5fba68f64b8e0a62f170fcf09ad8`
         const { data } = await axios.get(url)
 
         data[
@@ -168,6 +204,10 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
       }
     }
 
+    getData()
+  }, [])
+
+  React.useEffect(() => {
     const getDetailCountrySituation = async () => {
       try {
         const currentYear = moment().format('YYYY')
@@ -186,12 +226,27 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
           to: selectYear === currentYear ? currentDate : endOfYearSelected,
         }
 
+        if (countryName === 'united-states') {
+          let getLeft7Day = moment().subtract(7, 'days').calendar({
+            sameElse: 'YYYY-MM-DD',
+          })
+
+          params['from'] = getLeft7Day
+          params['to'] = currentDate
+        }
+
         const url = `https://api.covid19api.com/country/${countryName}?${queryString.stringify(
           params,
         )}`
 
         const { data } = await axios.get(url)
-        setDataDetailCountry(filterLastElOfEachMonth(data))
+
+        if (countryName === 'united-states') {
+          setDataOfUS(data.find((item) => item.Province === ''))
+        } else {
+          setDataDetailCountry(filterLastElOfEachMonth(data))
+        }
+
         setLoading(false)
         setLoadingChart(false)
       } catch (error) {
@@ -201,7 +256,6 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
       }
     }
 
-    // getData()
     getDetailCountrySituation()
   }, [selectYear])
 
@@ -244,15 +298,11 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
                   </p>
                 </div>
               </div>
-
-              {loadingChart ? (
-                <Spinner className='modal__spinner-chart' />
-              ) : (
-                <>
-                  {' '}
-                  <div className='modal__graph'>
-                    <div className='modal__graph-title'>
-                      <h4>Statistics</h4>
+              <div className='modal__graph'>
+                <div className='modal__graph-title'>
+                  <h4>Statistics</h4>
+                  {countryName === 'united-states' ? null : (
+                    <>
                       <select
                         className='modal__graph-dropdown'
                         value={selectYear}
@@ -261,14 +311,22 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
                         <option value='2020'>2020</option>
                         <option value='2021'>2021</option>
                       </select>
-                    </div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={options}
-                    />
-                  </div>
-                </>
-              )}
+                    </>
+                  )}
+                </div>
+                {loadingChart ? (
+                  <Spinner className='modal__spinner-chart' />
+                ) : (
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={
+                      countryName === 'united-states'
+                        ? optionsPieChart
+                        : options
+                    }
+                  />
+                )}
+              </div>
             </div>
 
             <div className='modal__footer'>
