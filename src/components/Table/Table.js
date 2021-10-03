@@ -91,14 +91,12 @@ const Table = ({
   setCountryCode,
   setCountryName,
 }) => {
-  console.log(rows)
-
   return (
     <>
       <table>
         <thead>
           <tr>
-            <th></th>
+            <th>Bookmark</th>
             <th>No</th>
             <th>Country</th>
             <th>

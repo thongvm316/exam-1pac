@@ -82,6 +82,7 @@
   }
 
   &__country-image {
+    height: 162px;
     margin-right: 1.5rem;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 
@@ -162,11 +163,17 @@
         font-size: 25px;
       }
     }
+
+    &__country-image {
+      height: initial;
+      min-height: 110px;
+    }
   }
 
   @include screen('xs') {
     &__country-information {
       flex-direction: column;
+      align-items: center;
 
       div:first-child {
         flex-basis: initial;
@@ -180,7 +187,21 @@
     }
 
     &__country-image {
-      margin-right: 0;
+      margin: 0 0 1rem 0;
+    }
+
+    &__country-detail {
+      font-size: 14px;
+    }
+
+    &__graph {
+      margin-bottom: 2rem;
+    }
+
+    &__title {
+      h1 {
+        font-size: 20px;
+      }
     }
   }
 }

@@ -15,7 +15,6 @@ hcnd(Highcharts)
 const Modal = ({ setOpenModal, countryCode, countryName }) => {
   const [data, setData] = React.useState(null)
   const [dataDetailCountry, setDataDetailCountry] = React.useState([])
-  const [dataOfUS, setDataOfUS] = React.useState(null)
   const [selectYear, setSelectYear] = React.useState('2021')
   const [loading, setLoading] = React.useState(true)
   const [loadingChart, setLoadingChart] = React.useState(false)
@@ -103,95 +102,47 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
     [dataDetailCountry],
   )
 
-  const optionsPieChart = React.useMemo(
-    () => ({
-      chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie',
-      },
-      title: {
-        text: '',
-      },
-
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: true,
-            format: '<b>{point.name}</b>: {point.y}',
-          },
-          showInLegend: true,
-        },
-      },
-      series: [
-        {
-          name: 'Brands',
-          colorByPoint: true,
-          data: [
-            {
-              name: 'Confirmed',
-              y: dataOfUS?.Confirmed,
-              sliced: true,
-              selected: true,
-              color: '#FEB13B',
-            },
-            {
-              name: 'Deaths',
-              y: dataOfUS?.Deaths,
-              color: '#e74c3c',
-            },
-            {
-              name: 'Recovered',
-              y: dataOfUS?.Recovered,
-              color: '#27ae60',
-            },
-          ],
-        },
-      ],
-    }),
-    [dataOfUS],
-  )
-
   const formatConditionDate = (year, index) => {
     const format = `${year}-${index < 10 ? `0${index}` : index}`
     const endOfMonth = moment(format).endOf('month').format('DD')
     return `${format}-${endOfMonth}`
   } // eg: 2021-02-28
 
-  const filterLastElOfEachMonth = (db) => {
-    let arr = []
+  const filterLastElOfEachMonth = React.useCallback(
+    (db) => {
+      let arr = []
 
-    const lastElOfData = db[db.length - 1]
-    const currentMonth = parseInt(moment(lastElOfData['Date']).format('MM'))
+      const lastElOfData = db[db.length - 1]
+      const currentMonth = parseInt(moment(lastElOfData['Date']).format('MM'))
 
-    for (let index = 1; index <= currentMonth; index++) {
-      const lastElOfEachMonth = db.find((item) => {
-        const dateOfItem = moment(item['Date']).format('YYYY-MM-DD')
-        const endOfDateInMonth = formatConditionDate(selectYear, index)
+      for (let index = 1; index <= currentMonth; index++) {
+        const lastElOfEachMonth = db.find((item) => {
+          const dateOfItem = moment(item['Date']).format('YYYY-MM-DD')
+          const endOfDateInMonth = formatConditionDate(selectYear, index)
 
-        if (index !== currentMonth) {
-          return dateOfItem === endOfDateInMonth && item.Province === '' // * use in case that country has data of each Province
-        } else {
-          return (
-            dateOfItem === moment(lastElOfData['Date']).format('YYYY-MM-DD') &&
-            item.Province === '' // * use in case that country has data of each Province
-          )
-        }
-      })
+          if (index !== currentMonth) {
+            return dateOfItem === endOfDateInMonth && item.Province === '' // * use in case that country has data of each Province
+          } else {
+            return (
+              dateOfItem ===
+                moment(lastElOfData['Date']).format('YYYY-MM-DD') &&
+              item.Province === '' // * use in case that country has data of each Province
+            )
+          }
+        })
 
-      arr.push(lastElOfEachMonth)
-    }
+        arr.push(lastElOfEachMonth)
+      }
 
-    return arr
-  }
+      return arr
+    },
+    [selectYear],
+  )
 
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=464a5fba68f64b8e0a62f170fcf09ad8`
+        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=2b24d6eeb6a0a9e5d448786e9edcfd76`
         const { data } = await axios.get(url)
 
         data[
@@ -199,13 +150,12 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
         ] = `https://flagcdn.com/w320/${countryCode.toLowerCase()}.jpg`
         setData(data)
       } catch (error) {
-        setLoading(false)
         console.log(error.response)
       }
     }
 
     getData()
-  }, [])
+  }, [countryCode])
 
   React.useEffect(() => {
     const getDetailCountrySituation = async () => {
@@ -226,26 +176,13 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
           to: selectYear === currentYear ? currentDate : endOfYearSelected,
         }
 
-        if (countryName === 'united-states') {
-          let getLeft7Day = moment().subtract(7, 'days').calendar({
-            sameElse: 'YYYY-MM-DD',
-          })
-
-          params['from'] = getLeft7Day
-          params['to'] = currentDate
-        }
-
         const url = `https://api.covid19api.com/country/${countryName}?${queryString.stringify(
           params,
         )}`
 
         const { data } = await axios.get(url)
 
-        if (countryName === 'united-states') {
-          setDataOfUS(data.find((item) => item.Province === ''))
-        } else {
-          setDataDetailCountry(filterLastElOfEachMonth(data))
-        }
+        setDataDetailCountry(filterLastElOfEachMonth(data))
 
         setLoading(false)
         setLoadingChart(false)
@@ -257,7 +194,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
     }
 
     getDetailCountrySituation()
-  }, [selectYear])
+  }, [selectYear, countryName, filterLastElOfEachMonth])
 
   return (
     <div className='modal'>
@@ -317,14 +254,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
                 {loadingChart ? (
                   <Spinner className='modal__spinner-chart' />
                 ) : (
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={
-                      countryName === 'united-states'
-                        ? optionsPieChart
-                        : options
-                    }
-                  />
+                  <HighchartsReact highcharts={Highcharts} options={options} />
                 )}
               </div>
             </div>

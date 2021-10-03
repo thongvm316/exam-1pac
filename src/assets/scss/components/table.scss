@@ -14,10 +14,22 @@ td {
 th {
   background-color: #0667ae;
   color: #ffffff;
+  text-align: center;
+}
+
+th:nth-child(1),
+th:nth-child(2) {
+  width: 8%;
+}
+
+th:nth-child(3),
+th:nth-child(4) {
+  width: 46%;
 }
 
 td {
   background-color: rgb(205, 235, 253);
+  text-align: center;
 }
 
 td:nth-child(3) {

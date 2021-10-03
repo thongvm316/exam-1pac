@@ -52,7 +52,7 @@ const App = () => {
         const { data: summary } = await axios.get(
           'https://api.covid19api.com/summary',
         )
-        setData({ ...data, globalSituation: summary.Global })
+        setData((prev) => ({ ...prev, globalSituation: summary.Global }))
         filterDataByRules(
           summary.Countries,
           'TotalConfirmed',
