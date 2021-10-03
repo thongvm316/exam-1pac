@@ -143,7 +143,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=2b24d6eeb6a0a9e5d448786e9edcfd76`
+        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=f3dc2072bcb82144bec53bbf7d4dd108`
         const { data } = await axios.get(url)
 
         data[
