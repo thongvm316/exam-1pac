@@ -1,3 +1,5 @@
+@import '../responsive';
+
 .alert {
   width: 100vw;
   height: 100vh;
@@ -47,6 +49,15 @@
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
+    }
+  }
+}
+
+/* Responsive */
+.alert {
+  @include screen('xs') {
+    &__container {
+      width: 85%;
     }
   }
 }

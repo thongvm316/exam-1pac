@@ -13,7 +13,8 @@
   &__container {
     position: relative;
     width: 800px;
-    min-height: 863px;
+    min-height: 800px;
+    height: auto;
     border-radius: 12px;
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -61,7 +62,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 2rem;
   }
 
   &__country-information {
@@ -202,6 +202,10 @@
       h1 {
         font-size: 20px;
       }
+    }
+
+    &__country-image {
+      height: 150px;
     }
   }
 }

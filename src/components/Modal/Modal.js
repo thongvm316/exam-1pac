@@ -28,6 +28,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
     () => ({
       chart: {
         type: 'column',
+        height: 300,
       },
       title: {
         text: '',
@@ -93,8 +94,8 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
       },
       noData: {
         style: {
-          fontWeight: 'bold',
-          fontSize: '15px',
+          fontWeight: '400',
+          fontSize: '13px',
           color: '#303030',
         },
       },
