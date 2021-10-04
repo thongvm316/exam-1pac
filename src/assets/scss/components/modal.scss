@@ -155,7 +155,7 @@
 .modal {
   @include breakpoint-down('lg') {
     &__container {
-      max-height: 90vh;
+      max-height: 95vh;
       min-height: 500px;
       height: auto;
     }
@@ -168,10 +168,6 @@
     &__country-image,
     &__country-detail {
       height: 100%;
-    }
-
-    &__body {
-      margin-bottom: 1.5rem;
     }
 
     &__footer {
