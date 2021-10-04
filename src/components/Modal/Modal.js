@@ -124,6 +124,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
           if (index !== currentMonth) {
             return dateOfItem === endOfDateInMonth && item.Province === '' // * use in case that country has data of each Province
           } else {
+            // in case, if params.toDate = currentDate, and currentDate note up-to-date (value = 0) --> so should compare with data res from api (may be current - 1,2,3...) and render data
             return (
               dateOfItem ===
                 moment(lastElOfData['Date']).format('YYYY-MM-DD') &&
@@ -143,7 +144,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=8082ed0d551a3c417a2a6b6a48ab3ee1`
+        const url = `http://api.countrylayer.com/v2/alpha/${countryCode}?access_key=f58063b2c195ed073bacf07987726a99`
         const { data } = await axios.get(url)
 
         data[
