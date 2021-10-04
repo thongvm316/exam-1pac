@@ -28,7 +28,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
     () => ({
       chart: {
         type: 'column',
-        height: 300,
+        height: 250,
       },
       title: {
         text: '',
@@ -204,7 +204,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
           <Spinner className='modal__spinner' />
         ) : (
           <>
-            <div className='modal__closeButton'>
+            {/* <div className='modal__closeButton'>
               <button
                 onClick={() => {
                   setOpenModal(false)
@@ -212,7 +212,7 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
               >
                 X
               </button>
-            </div>
+            </div> */}
 
             <div className='modal__title'>
               <h1>{data?.name} Situation</h1>
