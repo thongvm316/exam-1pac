@@ -204,18 +204,13 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
           <Spinner className='modal__spinner' />
         ) : (
           <>
-            {/* <div className='modal__closeButton'>
-              <button
-                onClick={() => {
-                  setOpenModal(false)
-                }}
-              >
-                X
-              </button>
-            </div> */}
-
             <div className='modal__title'>
-              <h1>{data?.name} Situation</h1>
+              <h1>
+                {countryName === 'united-kingdom'
+                  ? 'United Kingdom'
+                  : data?.name}{' '}
+                Situation
+              </h1>
             </div>
 
             <div className='modal__body'>
@@ -226,7 +221,12 @@ const Modal = ({ setOpenModal, countryCode, countryName }) => {
 
                 <div className='modal__country-detail'>
                   <p>
-                    Name: <span>{data?.name}</span>
+                    Name:{' '}
+                    <span>
+                      {countryName === 'united-kingdom'
+                        ? 'United Kingdom'
+                        : data?.name}
+                    </span>
                   </p>
                   <p>
                     Capital: <span>{data?.capital}</span>
