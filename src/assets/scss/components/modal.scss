@@ -62,6 +62,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
   &__country-information {
@@ -118,6 +119,10 @@
   }
 
   &__graph-title {
+    margin-bottom: 1rem;
+  }
+
+  &__graph-title {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -156,7 +161,7 @@
   @include breakpoint-down('lg') {
     &__container {
       max-height: 95vh;
-      min-height: 500px;
+      min-height: 570px;
       height: auto;
     }
 
